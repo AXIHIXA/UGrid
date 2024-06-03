@@ -1,0 +1,164 @@
+#include <iostream>
+
+#include <cublas_v2.h>
+#include <cuda_runtime.h>
+#include <cusolver_common.h>
+#include <cusolverSp.h>
+#include <cusparse_v2.h>
+
+#include <pybind11/numpy.h>
+
+#include "cpmg/assembler.h"
+#include "cpmg/cpgmg.h"
+#include "cpmg/cpmg.h"
+#include "cpmg/cuda_utils.h"
+
+
+namespace cpmg::cpgmg
+{
+
+namespace
+{
+
+pybind11::array_t<Float>
+solve_gmg(
+        const pybind11::array_t<bool> & boundaryMask,
+        const pybind11::array_t<Float> & laplacian,
+        const pybind11::array_t<Float> & boundaryValue,
+        const pybind11::array_t<Float> & initialGuess,
+        Float relativeTolerance
+)
+{
+    // +---------------------------------------------+
+    // | Problem assembly and GPU memory allocation. |
+    // +---------------------------------------------+
+
+    std::vector<int> col, ptr;
+    std::vector<Float> val, rhs;
+    int n2 = assemble2DPoissonProblem(boundaryMask, laplacian, boundaryValue, val, col, ptr, rhs);
+
+    int * cudaCol = nullptr;
+    CUDA_CHECK(cudaMalloc(&cudaCol, sizeof(int) * col.size()));
+    CUDA_CHECK(cudaMemcpy(cudaCol, col.data(), sizeof(int) * col.size(), cudaMemcpyHostToDevice));
+
+    int * cudaPtr = nullptr;
+    CUDA_CHECK(cudaMalloc(&cudaPtr, sizeof(int) * ptr.size()));
+    CUDA_CHECK(cudaMemcpy(cudaPtr, ptr.data(), sizeof(int) * ptr.size(), cudaMemcpyHostToDevice));
+
+    Float * cudaVal = nullptr;
+    CUDA_CHECK(cudaMalloc(&cudaVal, sizeof(Float) * val.size()));
+    CUDA_CHECK(cudaMemcpy(cudaVal, val.data(), sizeof(Float) * val.size(), cudaMemcpyHostToDevice));
+
+    Float * cudaRhs = nullptr;
+    CUDA_CHECK(cudaMalloc(&cudaRhs, sizeof(Float) * rhs.size()));
+    CUDA_CHECK(cudaMemcpy(cudaRhs, rhs.data(), sizeof(Float) * rhs.size(), cudaMemcpyHostToDevice));
+
+    Float * cudaX = nullptr;
+    CUDA_CHECK(cudaMalloc(&cudaX, initialGuess.nbytes()));
+    CUDA_CHECK(cudaMemcpy(cudaX, initialGuess.data(), sizeof(Float) * initialGuess.size(), cudaMemcpyHostToDevice));
+
+    // +--------------------------------+
+    // | CUDA libraries initialization. |
+    // +--------------------------------+
+
+    cublasHandle_t cublasHandle = nullptr;
+    CUBLAS_CHECK(cublasCreate_v2(&cublasHandle));
+
+    cusparseHandle_t cusparseHandle = nullptr;
+    CUSPARSE_CHECK(cusparseCreate(&cusparseHandle));
+
+    cusolverSpHandle_t cusolverSpHandle = nullptr;
+    CUSOLVER_CHECK(cusolverSpCreate(&cusolverSpHandle));
+
+    // +-----------------------------------------------+
+    // | Solve a generic sparse linear system A x = b. |
+    // +-----------------------------------------------+
+
+    auto t1 = Clock::now();
+
+//    cusparseSpMatDescr_t cusparseSpMatA = nullptr;
+//    CUSPARSE_CHECK(
+//            cusparseCreateCsr(
+//                    &cusparseSpMatA, n2, n2, static_cast<int64_t>(val.size()),
+//                    cudaPtr, cudaCol, cudaVal,
+//                    CUSPARSE_INDEX_32I, CUSPARSE_INDEX_32I,
+//                    CUSPARSE_INDEX_BASE_ZERO, CUDA_R_32F
+//            )
+//    );
+
+//    cusparseDnVecDescr_t cusparseDnVecX = nullptr;
+//    cusparseCreateDnVec(&cusparseDnVecX, static_cast<int64_t>(initialGuess.size()),
+//                        cudaX, CUDA_R_32F);
+//
+//    cusparseDnVecDescr_t cusparseDnVecB = nullptr;
+//    cusparseCreateDnVec(&cusparseDnVecB, static_cast<int64_t>(rhs.size()),
+//                        cudaRhs, CUDA_R_32F);
+
+    cusparseMatDescr_t cusparseMatA = nullptr;
+    CUSPARSE_CHECK(cusparseCreateMatDescr(&cusparseMatA));
+
+    std::cout << "hehehehehehehe\n";
+
+
+
+
+//    CUSOLVER_CHECK(
+//            cusolverSpScsrlsvqr(
+//                    cusolverSpHandle,
+//                    n2, static_cast<int>(val.size()),
+//                    cusparseMatA, cudaVal, cudaPtr, cudaCol,
+//                    cudaRhs,
+//                    relativeTolerance, 0, cudaX, nullptr
+//            )
+//    );
+//    CUDA_CHECK(cudaDeviceSynchronize());
+
+    auto t2 = Clock::now();
+    std::cout << "Took " << std::chrono::duration_cast<Duration>(t2 - t1).count() << " ms\n";
+
+    std::vector<Float> y(boundaryMask.size(), 0.0f);
+    CUDA_CHECK(cudaMemcpy(y.data(), cudaX, initialGuess.size(), cudaMemcpyDeviceToHost));
+
+    // +---------------------+
+    // | Free all resources. |
+    // +---------------------+
+
+    CUSPARSE_CHECK(cusparseDestroyMatDescr(cusparseMatA));
+//    CUSPARSE_CHECK(cusparseDestroyDnVec(cusparseDnVecX));
+//    CUSPARSE_CHECK(cusparseDestroyDnVec(cusparseDnVecB));
+
+    CUBLAS_CHECK(cublasDestroy_v2(cublasHandle));
+    CUSPARSE_CHECK(cusparseDestroy(cusparseHandle));
+    CUSOLVER_CHECK(cusolverSpDestroy(cusolverSpHandle));
+
+    CUDA_CHECK(cudaFree(cudaCol));
+    CUDA_CHECK(cudaFree(cudaPtr));
+    CUDA_CHECK(cudaFree(cudaVal));
+    CUDA_CHECK(cudaFree(cudaRhs));
+    CUDA_CHECK(cudaFree(cudaX));
+
+    return pybind11::array_t<Float>(n2, y.data());
+}
+
+}  // namespace anonmyous
+
+
+void init_py_module(pybind11::module_ & m)
+{
+    namespace py = pybind11;
+    using py::literals::operator""_a;
+
+    // This statement must be in the same source file of the function referenced!
+    // Otherwise, there will be undefined symbols.
+    m.def("solve_gmg",
+          solve_gmg,
+          "boundary_mask"_a,
+          "laplacian"_a,
+          "boundary_value"_a,
+          "initial_guess"_a,
+          "relative_tolerance"_a,
+          py::return_value_policy::move
+    );
+}
+
+}  // namespace cpmg::cpgmg
