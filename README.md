@@ -4,6 +4,8 @@ This repository is the official implementation of our ICML 2024 paper named
 
 ***UGrid: An Efficient-And-Rigorous Neural Multigrid Solver for Linear PDEs***.
 
+The paper is available at [https://openreview.net/forum?id=vFATIZXlCm](https://openreview.net/forum?id=vFATIZXlCm). 
+
 ## Data Generation
 
 To generate the dataset, run this command:
