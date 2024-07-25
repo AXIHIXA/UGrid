@@ -48,4 +48,15 @@ please refer to [their offical repository](https://github.com/ermongroup/Neural-
 
 Self-contained in `var/checkpoint/22/`. 
 
+## How to Cite
 
+```
+@inproceedings{
+    han2024ugrid,
+    title={{UGrid: An Efficient-And-Rigorous Neural Multigrid Solver for Linear PDEs}},
+    author={Han, Xi and Hou, Fei and Qin, Hong},
+    booktitle={Proceedings of 41th International Conference on Machine Learning (ICML)},
+    year={2024},
+    url={https://openreview.net/forum?id=vFATIZXlCm}
+}
+```
