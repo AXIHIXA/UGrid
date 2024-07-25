@@ -55,7 +55,7 @@ Self-contained in `var/checkpoint/22/`.
     han2024ugrid,
     title={{UGrid: An Efficient-And-Rigorous Neural Multigrid Solver for Linear PDEs}},
     author={Han, Xi and Hou, Fei and Qin, Hong},
-    booktitle={Proceedings of The 41st International Conference on Machine Learning (ICML)},
+    booktitle={Proceedings of the 41st International Conference on Machine Learning (ICML)},
     year={2024},
     url={https://openreview.net/forum?id=vFATIZXlCm}
 }
