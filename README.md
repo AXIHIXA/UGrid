@@ -8,6 +8,7 @@ In *Proceedings of the 41st International Conference on Machine Learning*,
 pp. 17354--17373, July 2024. 
 
 The paper is available at:
+- [arXiv](https://arxiv.org/abs/2408.04846)
 - [PMLR](https://proceedings.mlr.press/v235/han24a.html)
 - [openreview](https://openreview.net/forum?id=vFATIZXlCm)
 
