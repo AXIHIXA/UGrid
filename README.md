@@ -1,10 +1,15 @@
 # UGrid: An Efficient-And-Rigorous Neural Multigrid Solver for Linear PDEs
 
-This repository is the official implementation of our ICML 2024 paper named
+This repository is the official implementation of our ICML'2024 paper
 
-***UGrid: An Efficient-And-Rigorous Neural Multigrid Solver for Linear PDEs***.
+Xi Han, Fei Hou, Hong Qin, 
+"UGrid: An Efficient-And-Rigorous Neural Multigrid Solver for Linear PDEs",
+In *Proceedings of the 41st International Conference on Machine Learning*, 
+pp. 17354--17373, July 2024. 
 
-The paper is available at [https://openreview.net/forum?id=vFATIZXlCm](https://openreview.net/forum?id=vFATIZXlCm). 
+The paper is available at:
+- [PMLR](https://proceedings.mlr.press/v235/han24a.html)
+- [openreview](https://openreview.net/forum?id=vFATIZXlCm)
 
 ## Data Generation
 
@@ -51,12 +56,16 @@ Self-contained in `var/checkpoint/22/`.
 ## How to Cite
 
 ```
-@inproceedings{
-    han2024ugrid,
-    title={{UGrid: An Efficient-And-Rigorous Neural Multigrid Solver for Linear PDEs}},
-    author={Han, Xi and Hou, Fei and Qin, Hong},
-    booktitle={Proceedings of the 41st International Conference on Machine Learning (ICML)},
-    year={2024},
-    url={https://openreview.net/forum?id=vFATIZXlCm}
+@inproceedings{han24-icml-ugrid,
+author={Han, Xi and Hou, Fei and Qin, Hong},
+title={{UG}rid: An Efficient-And-Rigorous Neural Multigrid Solver for Linear {PDE}s},
+booktitle={Proceedings of the 41st International Conference on Machine Learning},
+volume={},
+number={},
+pages={17354--17373},
+month={July},
+year={2024},
+pdf={https://raw.githubusercontent.com/mlresearch/v235/main/assets/han24a/han24a.pdf},
+url={https://proceedings.mlr.press/v235/han24a.html}
 }
 ```
