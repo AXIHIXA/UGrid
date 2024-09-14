@@ -59,14 +59,13 @@ Self-contained in `var/checkpoint/22/`.
 ```
 @inproceedings{han24-icml-ugrid,
 author={Han, Xi and Hou, Fei and Qin, Hong},
-title={{UG}rid: An Efficient-And-Rigorous Neural Multigrid Solver for Linear {PDE}s},
+title={{UGrid: An Efficient-And-Rigorous Neural Multigrid Solver for Linear PDEs}},
 booktitle={Proceedings of the 41st International Conference on Machine Learning},
 volume={},
 number={},
 pages={17354--17373},
 month={July},
 year={2024},
-pdf={https://raw.githubusercontent.com/mlresearch/v235/main/assets/han24a/han24a.pdf},
-url={https://proceedings.mlr.press/v235/han24a.html}
+url={https://arxiv.org/abs/2408.04846}
 }
 ```
